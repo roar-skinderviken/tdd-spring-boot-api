@@ -6,19 +6,15 @@ import no.javatec.hoaxify.user.vm.UserUpdateVM;
 import no.javatec.hoaxify.user.vm.UserVM;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Min;
 
 @RestController
 @RequestMapping("/api/1.0")
 @RequiredArgsConstructor
-@Validated
 public class UserController {
 
     private final UserService userService;
