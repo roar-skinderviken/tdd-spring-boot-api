@@ -23,18 +23,13 @@ public class UserController {
 
     private final UserService userService;
 
-    @GetMapping("/student/{age}")
-    ResponseEntity<String> student(@PathVariable("age") @Valid @Min(5) int age) {
-        return ResponseEntity.ok("Your age is " + age);
-    }
-
     @PostMapping("/users")
     GenericResponse createUser(@Valid @RequestBody User user) {
         userService.save(user);
         return new GenericResponse("User saved");
     }
 
-    // can be using @PageableDefault(size = 10) instead for global
+    // can be using @PageableDefault(size = 10) instead of global
     @GetMapping("/users")
     Page<UserVM> getUsers(@AuthenticationPrincipal User user, Pageable pageable) {
         return userService.getUsers(user, pageable).map(UserVM::new);

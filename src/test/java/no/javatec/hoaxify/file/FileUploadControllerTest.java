@@ -66,27 +66,8 @@ public class FileUploadControllerTest {
 
     @Test
     public void uploadFile_withImageFromAuthUser_receiveOk() {
-
-        // create validated user
         var user = userService.save(createValidUser("user1"));
         authenticate(user.getUsername());
-
-/*
-        webTestClient.post()
-                .uri(API_1_0_HOAXES_UPLOAD)
-                .exchange()
-                .expectStatus().isOk();
-
-        var username =
-
-        webTestClient.post()
-                .uri("/user/repos")
-                //.header("Authorization", "Basic " + Base64Utils.encodeToString((username + ":P4ssword").getBytes(UTF_8)))
-                .body(BodyInserters.fromPublisher(Mono.just("data"), String.class))
-                .exchange()
-                .expectStatus().isOk();
-*/
-
 
         ResponseEntity<Object> response = uploadFile(getRequestEntity(), Object.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);

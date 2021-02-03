@@ -224,7 +224,7 @@ public class HoaxControllerTest {
         Hoax hoax = createdValidHoax();
         hoax.setAttachment(savedFile);
 
-        authenticate2(user.getUsername());
+        authenticate(user.getUsername());
 
         var response = postHoax(hoax, user.getUsername())
                 .expectBody(HoaxVM.class)
@@ -702,10 +702,6 @@ public class HoaxControllerTest {
         return clientBuilder
                 .bodyValue(hoax)
                 .exchange();
-    }
-
-    private void authenticate2(String username) {
-        webTestClient.options().headers(httpHeaders -> httpHeaders.setBasicAuth(username, TEST_PASSWORD));
     }
 
     private void authenticate(String username) {

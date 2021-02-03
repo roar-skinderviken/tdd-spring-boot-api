@@ -15,8 +15,6 @@ public class HoaxVM {
     private long date;
     private UserVM user;
     private FileAttachmentVM attachment;
-    private String roar;
-
 
     public HoaxVM(Hoax hoax) {
         this.id = hoax.getId();

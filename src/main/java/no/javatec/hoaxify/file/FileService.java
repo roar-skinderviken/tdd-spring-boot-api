@@ -6,6 +6,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.tika.Tika;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -73,7 +74,7 @@ public class FileService {
         return fileAttachmentRepository.save(fileAttachment);
     }
 
-    //@Scheduled(fixedRate = 60 * 60 * 1000)
+    @Scheduled(fixedRate = 60 * 60 * 1000)
     public void cleanupStorage() {
         Date oneHourAgo = new Date(System.currentTimeMillis() - 60 * 60 * 1000);
         var oldFiles = fileAttachmentRepository.findByDateBeforeAndHoaxIsNull(oneHourAgo);
