@@ -34,9 +34,9 @@ public class FileAttachmentRepositoryTest {
 
     @Test
     public void findByDateBeforeAndHoaxIsNull_whenAttachmentsOlderThanOneHourButHaveHoax_returnNone() {
-        var hoax1 = testEntityManager.persist(TestUtils.createdValidHoax());
-        var hoax2 = testEntityManager.persist(TestUtils.createdValidHoax());
-        var hoax3 = testEntityManager.persist(TestUtils.createdValidHoax());
+        var hoax1 = testEntityManager.persist(TestUtils.createValidHoax());
+        var hoax2 = testEntityManager.persist(TestUtils.createValidHoax());
+        var hoax3 = testEntityManager.persist(TestUtils.createValidHoax());
 
         testEntityManager.persist(getOldFileAttachmentWithHoax(hoax1));
         testEntityManager.persist(getOldFileAttachmentWithHoax(hoax2));

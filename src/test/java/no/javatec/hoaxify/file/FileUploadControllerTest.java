@@ -9,22 +9,18 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.http.*;
-import org.springframework.http.client.support.BasicAuthenticationInterceptor;
+import org.springframework.http.MediaType;
+import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import org.springframework.util.Base64Utils;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.BodyInserters;
-import reactor.core.publisher.Mono;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Objects;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
+import static no.javatec.hoaxify.TestUtils.TEST_PASSWORD;
 import static no.javatec.hoaxify.TestUtils.createValidUser;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -37,9 +33,6 @@ public class FileUploadControllerTest {
 
     @Autowired
     WebTestClient webTestClient;
-
-    @Autowired
-    TestRestTemplate testRestTemplate;
 
     @Autowired
     UserRepository userRepository;
@@ -60,87 +53,86 @@ public class FileUploadControllerTest {
     public void init() throws IOException {
         userRepository.deleteAll();
         fileAttachmentRepository.deleteAll();
-        testRestTemplate.getRestTemplate().getInterceptors().clear();
         FileUtils.cleanDirectory(new File(appConfiguration.getFullAttachmentsPath()));
     }
 
     @Test
     public void uploadFile_withImageFromAuthUser_receiveOk() {
         var user = userService.save(createValidUser("user1"));
-        authenticate(user.getUsername());
 
-        ResponseEntity<Object> response = uploadFile(getRequestEntity(), Object.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        uploadFile2(user.getUsername())
+                .expectStatus().isOk();
     }
 
     @Test
     public void uploadFile_withUnauthorizedUser_receiveUnauthorized() {
-        var response = uploadFile(getRequestEntity(), Object.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+        uploadFile2(null)
+                .expectStatus().isUnauthorized();
     }
 
     @Test
     public void uploadFile_withImageFromAuthUser_receiveFileAttachmentWithDate() {
         var user = userService.save(createValidUser("user1"));
-        authenticate(user.getUsername());
 
-        ResponseEntity<FileAttachment> response = uploadFile(getRequestEntity(), FileAttachment.class);
-        assertThat(response.getBody().getDate()).isNotNull();
+        uploadFile2(user.getUsername())
+                .expectBody(FileAttachment.class)
+                .value(attachment -> assertThat(attachment.getDate()).isNotNull());
     }
 
     @Test
     public void uploadFile_withImageFromAuthUser_receiveFileAttachmentWithRandomName() {
         var user = userService.save(createValidUser("user1"));
-        authenticate(user.getUsername());
 
-        ResponseEntity<FileAttachment> response = uploadFile(getRequestEntity(), FileAttachment.class);
-        assertThat(response.getBody().getName()).isNotNull();
-        assertThat(response.getBody().getName()).isNotEqualTo("profile.png");
+        uploadFile2(user.getUsername())
+                .expectBody(FileAttachment.class)
+                .value(attachment -> {
+                    assertThat(attachment.getName()).isNotNull();
+                    assertThat(attachment.getName()).isNotEqualTo("profile.png");
+                });
     }
 
     @Test
     public void uploadFile_withImageFromAuthUser_imageSavedToFolder() {
         var user = userService.save(createValidUser("user1"));
-        authenticate(user.getUsername());
 
-        ResponseEntity<FileAttachment> response = uploadFile(getRequestEntity(), FileAttachment.class);
+        var fileAttachment = uploadFile2(user.getUsername())
+                .expectBody(FileAttachment.class)
+                .returnResult()
+                .getResponseBody();
 
-        var file = new File(appConfiguration.getFullAttachmentsPath() + "/" + response.getBody().getName());
+        var file = new File(appConfiguration.getFullAttachmentsPath() + "/" + Objects.requireNonNull(fileAttachment).getName());
         assertThat(file.exists()).isTrue();
     }
 
     @Test
     public void uploadFile_withImageFromAuthUser_imageSavedToDatabase() {
         var user = userService.save(createValidUser("user1"));
-        authenticate(user.getUsername());
-        uploadFile(getRequestEntity(), FileAttachment.class);
+        uploadFile2(user.getUsername());
         assertThat(fileAttachmentRepository.count()).isEqualTo(1);
     }
 
     @Test
     public void uploadFile_withImageFromAuthUser_fileAttachmentStoredWithFileType() {
         var user = userService.save(createValidUser("user1"));
-        authenticate(user.getUsername());
-        uploadFile(getRequestEntity(), FileAttachment.class);
+        uploadFile2(user.getUsername());
         assertThat(fileAttachmentRepository.findAll().get(0).getFileType()).isEqualTo("image/png");
     }
 
-    private <T> ResponseEntity<T> uploadFile(HttpEntity<?> requestEntity, Class<T> responseType) {
-        return testRestTemplate.exchange(API_1_0_HOAXES_UPLOAD, HttpMethod.POST, requestEntity, responseType);
-    }
+    private WebTestClient.ResponseSpec uploadFile2(String loggedInUsername) {
+        var clientBuilder = webTestClient.post()
+                .uri(API_1_0_HOAXES_UPLOAD);
 
-    private HttpEntity<MultiValueMap<String, Object>> getRequestEntity() {
-        ClassPathResource imageResource = new ClassPathResource("profile.png");
-        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-        body.add("file", imageResource);
+        if (loggedInUsername != null) {
+            clientBuilder.headers(httpHeaders -> httpHeaders.setBasicAuth(loggedInUsername, TEST_PASSWORD));
+        }
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+        MultipartBodyBuilder multipartBodyBuilder = new MultipartBodyBuilder();
+        multipartBodyBuilder
+                .part("file", new ClassPathResource("profile.png"))
+                .contentType(MediaType.MULTIPART_FORM_DATA);
 
-        return new HttpEntity<>(body, headers);
-    }
-
-    private void authenticate(String username) {
-        testRestTemplate.getRestTemplate().getInterceptors().add(new BasicAuthenticationInterceptor(username, "P4ssword"));
+        return clientBuilder
+                .body(BodyInserters.fromMultipartData(multipartBodyBuilder.build()))
+                .exchange();
     }
 }

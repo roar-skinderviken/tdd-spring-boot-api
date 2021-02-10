@@ -26,7 +26,7 @@ public class TestUtils {
         return user;
     }
 
-    public static Hoax createdValidHoax() {
+    public static Hoax createValidHoax() {
         var hoax = new Hoax();
         hoax.setContent("test content for the test hoax");
         return hoax;
