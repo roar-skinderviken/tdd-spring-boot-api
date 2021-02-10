@@ -60,13 +60,13 @@ public class FileUploadControllerTest {
     public void uploadFile_withImageFromAuthUser_receiveOk() {
         var user = userService.save(createValidUser("user1"));
 
-        uploadFile2(user.getUsername())
+        uploadFile(user.getUsername())
                 .expectStatus().isOk();
     }
 
     @Test
     public void uploadFile_withUnauthorizedUser_receiveUnauthorized() {
-        uploadFile2(null)
+        uploadFile(null)
                 .expectStatus().isUnauthorized();
     }
 
@@ -74,7 +74,7 @@ public class FileUploadControllerTest {
     public void uploadFile_withImageFromAuthUser_receiveFileAttachmentWithDate() {
         var user = userService.save(createValidUser("user1"));
 
-        uploadFile2(user.getUsername())
+        uploadFile(user.getUsername())
                 .expectBody(FileAttachment.class)
                 .value(attachment -> assertThat(attachment.getDate()).isNotNull());
     }
@@ -83,7 +83,7 @@ public class FileUploadControllerTest {
     public void uploadFile_withImageFromAuthUser_receiveFileAttachmentWithRandomName() {
         var user = userService.save(createValidUser("user1"));
 
-        uploadFile2(user.getUsername())
+        uploadFile(user.getUsername())
                 .expectBody(FileAttachment.class)
                 .value(attachment -> {
                     assertThat(attachment.getName()).isNotNull();
@@ -95,7 +95,7 @@ public class FileUploadControllerTest {
     public void uploadFile_withImageFromAuthUser_imageSavedToFolder() {
         var user = userService.save(createValidUser("user1"));
 
-        var fileAttachment = uploadFile2(user.getUsername())
+        var fileAttachment = uploadFile(user.getUsername())
                 .expectBody(FileAttachment.class)
                 .returnResult()
                 .getResponseBody();
@@ -107,18 +107,18 @@ public class FileUploadControllerTest {
     @Test
     public void uploadFile_withImageFromAuthUser_imageSavedToDatabase() {
         var user = userService.save(createValidUser("user1"));
-        uploadFile2(user.getUsername());
+        uploadFile(user.getUsername());
         assertThat(fileAttachmentRepository.count()).isEqualTo(1);
     }
 
     @Test
     public void uploadFile_withImageFromAuthUser_fileAttachmentStoredWithFileType() {
         var user = userService.save(createValidUser("user1"));
-        uploadFile2(user.getUsername());
+        uploadFile(user.getUsername());
         assertThat(fileAttachmentRepository.findAll().get(0).getFileType()).isEqualTo("image/png");
     }
 
-    private WebTestClient.ResponseSpec uploadFile2(String loggedInUsername) {
+    private WebTestClient.ResponseSpec uploadFile(String loggedInUsername) {
         var clientBuilder = webTestClient.post()
                 .uri(API_1_0_HOAXES_UPLOAD);
 

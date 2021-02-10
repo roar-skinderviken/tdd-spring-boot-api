@@ -228,7 +228,7 @@ public class UserControllerTest {
         postUser(user)
                 .expectBody(ApiError.class)
                 .value(apiError -> assertThat(apiError.getValidationErrors().get("password"))
-                        .isEqualTo("Password must have at least on uppercase, one lowercase letter and one number"));
+                        .isEqualTo("Password must have at least one uppercase, one lowercase letter and one number"));
     }
 
     @Test
