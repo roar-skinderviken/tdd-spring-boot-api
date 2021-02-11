@@ -150,7 +150,7 @@ public class UserControllerTest {
     @Test
     public void postUser_whenUserHasPasswordThatExceedsLength_receiveBadRequest() {
         var user = createValidUser();
-        user.setPassword("a".repeat(256));
+        user.setPassword(TEST_PASSWORD + "a".repeat(256 - TEST_PASSWORD.length()));
         postUser(user).expectStatus().isBadRequest();
     }
 
