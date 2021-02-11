@@ -25,6 +25,10 @@ public class ExceptionHandlerAdvice {
                 ERROR_MSG,
                 request.getServletPath(),
                 exception.getBindingResult().getFieldErrors().stream()
-                        .collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage)));
+                        .collect(Collectors.toMap(
+                                FieldError::getField,
+                                FieldError::getDefaultMessage,
+                                // mergeFunction handling multiple errors for a field
+                                (firstMessage, secondMessage) -> firstMessage)));
     }
 }
