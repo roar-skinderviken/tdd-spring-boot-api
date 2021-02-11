@@ -126,7 +126,7 @@ public class FileUploadControllerTest {
             clientBuilder.headers(httpHeaders -> httpHeaders.setBasicAuth(loggedInUsername, TEST_PASSWORD));
         }
 
-        MultipartBodyBuilder multipartBodyBuilder = new MultipartBodyBuilder();
+        var multipartBodyBuilder = new MultipartBodyBuilder();
         multipartBodyBuilder
                 .part("file", new ClassPathResource("profile.png"))
                 .contentType(MediaType.MULTIPART_FORM_DATA);

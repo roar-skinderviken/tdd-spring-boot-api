@@ -124,8 +124,8 @@ public class HoaxControllerTest {
     @Test
     public void postHoax_whenHoaxContentIsLessThan10CharactersAndUserIsAuthorized_receiveBadRequest() {
         var user = userService.save(createValidUser("user1"));
+        var hoax = new Hoax();
 
-        Hoax hoax = new Hoax();
         hoax.setContent("a".repeat(9));
         postHoax(hoax, user.getUsername()).expectStatus().isBadRequest();
     }
@@ -133,8 +133,8 @@ public class HoaxControllerTest {
     @Test
     public void postHoax_whenHoaxContentIs5000CharactersAndUserIsAuthorized_hoaxIsSavedToDb() {
         var user = userService.save(createValidUser("user1"));
+        var hoax = new Hoax();
 
-        Hoax hoax = new Hoax();
         hoax.setContent("x".repeat(5000));
         postHoax(hoax, user.getUsername());
 
@@ -144,11 +144,12 @@ public class HoaxControllerTest {
     @Test
     public void postHoax_whenHoaxContentIsMoreThan5000CharactersAndUserIsAuthorized_receiveBadRequest() {
         var user = userService.save(createValidUser("user1"));
+        var hoax = new Hoax();
 
-        Hoax hoax = new Hoax();
         hoax.setContent("x".repeat(5001));
 
-        postHoax(hoax, user.getUsername()).expectStatus().isBadRequest();
+        postHoax(hoax, user.getUsername())
+                .expectStatus().isBadRequest();
     }
 
     @Test
@@ -187,19 +188,13 @@ public class HoaxControllerTest {
                 .value(hoaxVM -> assertThat(hoaxVM.getUser().getUsername()).isEqualTo(user.getUsername()));
     }
 
-    private MultipartFile createFile() throws IOException {
-        ClassPathResource imageResource = new ClassPathResource("profile.png");
-        return new MockMultipartFile("profile.png", FileUtils.readFileToByteArray(imageResource.getFile()));
-    }
-
     @Test
     public void postHoax_whenHoaxIsValidAndUserIsAuthorized_fileAttachmentHoaxRelationIsUpdatedInDatabase() throws IOException {
         var user = userService.save(createValidUser("user1"));
+        var multipartFile = createFile();
+        var savedFile = fileService.saveAttachment(multipartFile);
 
-        MultipartFile file = createFile();
-        var savedFile = fileService.saveAttachment(file);
-
-        Hoax hoax = createValidHoax();
+        var hoax = createValidHoax();
         hoax.setAttachment(savedFile);
 
         var response = postHoax(hoax, user.getUsername())
@@ -214,11 +209,10 @@ public class HoaxControllerTest {
     @Test
     public void postHoax_whenHoaxIsValidAndUserIsAuthorized_hoaxFileAttachmentRelationsIsUpdatedInDatabase() throws IOException {
         var user = userService.save(createValidUser("user1"));
+        var multipartFile = createFile();
+        var savedFile = fileService.saveAttachment(multipartFile);
 
-        MultipartFile file = createFile();
-        var savedFile = fileService.saveAttachment(file);
-
-        Hoax hoax = createValidHoax();
+        var hoax = createValidHoax();
         hoax.setAttachment(savedFile);
 
         var response = postHoax(hoax, user.getUsername())
@@ -233,11 +227,10 @@ public class HoaxControllerTest {
     @Test
     public void postHoax_whenHoaxIsValidAndUserIsAuthorized_receiveHoaxVMWithAttachment() throws IOException {
         var user = userService.save(createValidUser("user1"));
+        var multipartFile = createFile();
+        var savedFile = fileService.saveAttachment(multipartFile);
 
-        MultipartFile file = createFile();
-        var savedFile = fileService.saveAttachment(file);
-
-        Hoax hoax = createValidHoax();
+        var hoax = createValidHoax();
         hoax.setAttachment(savedFile);
 
         postHoax(hoax, user.getUsername())
@@ -615,10 +608,10 @@ public class HoaxControllerTest {
     public void deleteHoax_whenHoaxHasAttachment_attachmentRemovedFromDatabase() throws IOException {
         var user = userService.save(createValidUser("user1"));
 
-        MultipartFile file = createFile();
-        var savedFile = fileService.saveAttachment(file);
+        var multipartFile = createFile();
+        var savedFile = fileService.saveAttachment(multipartFile);
 
-        Hoax hoax = createValidHoax();
+        var hoax = createValidHoax();
         hoax.setAttachment(savedFile);
 
         var response = postHoax(hoax, user.getUsername())
@@ -638,11 +631,12 @@ public class HoaxControllerTest {
     public void deleteHoax_whenHoaxHasAttachment_attachmentRemovedFromFileStorage() throws IOException {
         var user = userService.save(createValidUser("user1"));
 
-        MultipartFile file = createFile();
-        var savedFile = fileService.saveAttachment(file);
+        var multipartFile = createFile();
+        var savedFile = fileService.saveAttachment(multipartFile);
 
-        Hoax hoax = createValidHoax();
+        var hoax = createValidHoax();
         hoax.setAttachment(savedFile);
+
         var response = postHoax(hoax, user.getUsername())
                 .expectBody(HoaxVM.class)
                 .returnResult()
@@ -735,5 +729,12 @@ public class HoaxControllerTest {
         return clientBuilder
                 .bodyValue(hoax)
                 .exchange();
+    }
+
+    private MultipartFile createFile() throws IOException {
+        var imageResource = new ClassPathResource("profile.png");
+        return new MockMultipartFile(
+                "profile.png",
+                FileUtils.readFileToByteArray(imageResource.getFile()));
     }
 }

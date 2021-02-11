@@ -33,7 +33,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class UserControllerTest {
 
-    public static final String API_1_0_USERS = "/api/1.0/users";
+    static final String API_1_0_USERS = "/api/1.0/users";
 
     @Autowired
     WebTestClient webTestClient;
@@ -91,21 +91,24 @@ public class UserControllerTest {
     public void postUser_whenUserHasNullName_receiveBadRequest() {
         var user = createValidUser();
         user.setUsername(null);
-        postUser(user).expectStatus().isBadRequest();
+        postUser(user)
+                .expectStatus().isBadRequest();
     }
 
     @Test
     public void postUser_whenUserHasNullDisplayName_receiveBadRequest() {
         var user = createValidUser();
         user.setDisplayName(null);
-        postUser(user).expectStatus().isBadRequest();
+        postUser(user)
+                .expectStatus().isBadRequest();
     }
 
     @Test
     public void postUser_whenUserHasNullPassword_receiveBadRequest() {
         var user = createValidUser();
         user.setPassword(null);
-        postUser(user).expectStatus().isBadRequest();
+        postUser(user)
+                .expectStatus().isBadRequest();
     }
 
     // min validation
@@ -114,21 +117,24 @@ public class UserControllerTest {
     public void postUser_whenUserHasNameWithLessThanRequired_receiveBadRequest() {
         var user = createValidUser();
         user.setUsername("abc");
-        postUser(user).expectStatus().isBadRequest();
+        postUser(user)
+                .expectStatus().isBadRequest();
     }
 
     @Test
     public void postUser_whenUserHasDisplayNameWithLessThanRequired_receiveBadRequest() {
         var user = createValidUser();
         user.setDisplayName("abc");
-        postUser(user).expectStatus().isBadRequest();
+        postUser(user)
+                .expectStatus().isBadRequest();
     }
 
     @Test
     public void postUser_whenUserHasPasswordWithLessThanRequired_receiveBadRequest() {
         var user = createValidUser();
         user.setPassword("P4sswd");
-        postUser(user).expectStatus().isBadRequest();
+        postUser(user)
+                .expectStatus().isBadRequest();
     }
 
     // max validation
@@ -137,42 +143,48 @@ public class UserControllerTest {
     public void postUser_whenUserHasNameThatExceedsLength_receiveBadRequest() {
         var user = createValidUser();
         user.setUsername("a".repeat(256));
-        postUser(user).expectStatus().isBadRequest();
+        postUser(user)
+                .expectStatus().isBadRequest();
     }
 
     @Test
     public void postUser_whenUserHasDisplayNameThatExceedsLength_receiveBadRequest() {
         var user = createValidUser();
         user.setDisplayName("a".repeat(256));
-        postUser(user).expectStatus().isBadRequest();
+        postUser(user)
+                .expectStatus().isBadRequest();
     }
 
     @Test
     public void postUser_whenUserHasPasswordThatExceedsLength_receiveBadRequest() {
         var user = createValidUser();
         user.setPassword("a".repeat(256));
-        postUser(user).expectStatus().isBadRequest();
+        postUser(user)
+                .expectStatus().isBadRequest();
     }
 
     @Test
     public void postUser_whenUserHasPasswordWithAllLowercase_receiveBadRequest() {
         var user = createValidUser();
         user.setPassword("a".repeat(8));
-        postUser(user).expectStatus().isBadRequest();
+        postUser(user)
+                .expectStatus().isBadRequest();
     }
 
     @Test
     public void postUser_whenUserHasPasswordWithAllUppercase_receiveBadRequest() {
         var user = createValidUser();
         user.setPassword("A".repeat(8));
-        postUser(user).expectStatus().isBadRequest();
+        postUser(user)
+                .expectStatus().isBadRequest();
     }
 
     @Test
     public void postUser_whenUserHasPasswordWithAllNumber_receiveBadRequest() {
         var user = createValidUser();
         user.setPassword("12345678");
-        postUser(user).expectStatus().isBadRequest();
+        postUser(user)
+                .expectStatus().isBadRequest();
     }
 
     @Test
@@ -206,7 +218,8 @@ public class UserControllerTest {
 
         postUser(user)
                 .expectBody(ApiError.class)
-                .value(apiError -> assertThat(apiError.getValidationErrors().get("password")).isEqualTo("Cannot be null"));
+                .value(apiError -> assertThat(apiError.getValidationErrors().get("password"))
+                        .isEqualTo("Cannot be null"));
     }
 
     @Test
@@ -234,7 +247,8 @@ public class UserControllerTest {
     @Test
     public void postUser_whenAnotherUserHasSameUsername_receiveBadRequest() {
         userRepository.save(createValidUser());
-        postUser(createValidUser()).expectStatus().isBadRequest();
+        postUser(createValidUser())
+                .expectStatus().isBadRequest();
     }
 
     @Test
@@ -359,14 +373,14 @@ public class UserControllerTest {
 
     @Test
     public void getUserByUsername_whenUserExists_receiveOk() {
-        final String username = "test-user";
+        var username = "test-user";
         userService.save(createValidUser(username));
         getUser(username).expectStatus().isOk();
     }
 
     @Test
     public void getUserByUsername_whenUserExists_receiveUserWithoutPassword() {
-        final String username = "test-user";
+        var username = "test-user";
         userService.save(createValidUser(username));
 
         getUser(username)
@@ -376,7 +390,8 @@ public class UserControllerTest {
 
     @Test
     public void getUserByUsername_whenUserDoesNotExists_receiveNotFound() {
-        getUser("unknown-user").expectStatus().isNotFound();
+        getUser("unknown-user")
+                .expectStatus().isNotFound();
     }
 
     @Test
@@ -396,7 +411,7 @@ public class UserControllerTest {
     @Test
     public void putUser_whenUnauthorizedUserSendsUpdateForAnotherUser_receiveForbidden() {
         var user = userService.save(createValidUser("user1"));
-        long anotherUserId = user.getId() + 123;
+        var anotherUserId = user.getId() + 123;
 
         putUser(anotherUserId, null, user.getUsername())
                 .expectStatus()
@@ -413,7 +428,7 @@ public class UserControllerTest {
     @Test
     public void putUser_whenUnauthorizedUserSendsUpdateForAnotherUser_receiveApiError() {
         var user = userService.save(createValidUser("user1"));
-        long anotherUserId = user.getId() + 123;
+        var anotherUserId = user.getId() + 123;
 
         putUser(anotherUserId, null, user.getUsername())
                 .expectBody(ApiError.class)
@@ -473,7 +488,7 @@ public class UserControllerTest {
         putUser(user.getId(), updateUser, user.getUsername())
                 .expectBody(UserVM.class)
                 .value(userVM -> {
-                    String profilePicturePath = appConfiguration.getFullProfileImagesPath() + "/" + userVM.getImage();
+                    var profilePicturePath = appConfiguration.getFullProfileImagesPath() + "/" + userVM.getImage();
                     assertThat(new File(profilePicturePath).exists()).isTrue();
                 });
     }
@@ -597,7 +612,7 @@ public class UserControllerTest {
     }
 
     private String readFileToBase64(String fileName) throws IOException {
-        ClassPathResource imageResource = new ClassPathResource(fileName);
+        var imageResource = new ClassPathResource(fileName);
         return Base64.getEncoder().encodeToString(FileUtils.readFileToByteArray(imageResource.getFile()));
     }
 

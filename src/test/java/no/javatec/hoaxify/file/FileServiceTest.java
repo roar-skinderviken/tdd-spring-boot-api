@@ -44,7 +44,7 @@ public class FileServiceTest {
 
     @Test
     public void detectType_whenPngFileProvided_returnsImagePng() throws IOException {
-        ClassPathResource resource = new ClassPathResource("test-png.png");
+        var resource = new ClassPathResource("test-png.png");
         var fileArr = FileUtils.readFileToByteArray(resource.getFile());
         var fileType = fileService.detectType(fileArr);
         assertThat(fileType).isEqualTo("image/png");
@@ -52,7 +52,7 @@ public class FileServiceTest {
 
     @Test
     public void cleanupStorage_whenOldFilesExists_removeFilesFromStorage() throws IOException {
-        File source = new ClassPathResource("profile.png").getFile();
+        var source = new ClassPathResource("profile.png").getFile();
 
         var fileName = "random-file";
         var filePath = appConfiguration.getFullAttachmentsPath() + "/" + fileName;
@@ -60,7 +60,7 @@ public class FileServiceTest {
 
         FileUtils.copyFile(source, target);
 
-        FileAttachment fileAttachment = new FileAttachment();
+        var fileAttachment = new FileAttachment();
         fileAttachment.setId(5);
         fileAttachment.setName(fileName);
 
@@ -68,14 +68,14 @@ public class FileServiceTest {
                 .thenReturn(List.of(fileAttachment));
 
         fileService.cleanupStorage();
-        File storedImage = new File(filePath);
+        var storedImage = new File(filePath);
 
         assertThat(storedImage.exists()).isFalse();
     }
 
     @Test
     public void cleanupStorage_whenOldFilesExists_removeFilesFromDatabase() throws IOException {
-        File source = new ClassPathResource("profile.png").getFile();
+        var source = new ClassPathResource("profile.png").getFile();
 
         var fileName = "random-file";
         var filePath = appConfiguration.getFullAttachmentsPath() + "/" + fileName;
@@ -83,7 +83,7 @@ public class FileServiceTest {
 
         FileUtils.copyFile(source, target);
 
-        FileAttachment fileAttachment = new FileAttachment();
+        var fileAttachment = new FileAttachment();
         fileAttachment.setId(5);
         fileAttachment.setName(fileName);
 

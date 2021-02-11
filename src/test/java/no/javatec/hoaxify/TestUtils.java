@@ -12,7 +12,7 @@ public class TestUtils {
     }
 
     public static User createValidUser() {
-        User user = new User();
+        var user = new User();
         user.setUsername(TEST_USERNAME);
         user.setDisplayName("test-display");
         user.setImage("profile-image.png");
@@ -21,7 +21,7 @@ public class TestUtils {
     }
 
     public static User createValidUser(String username) {
-        User user = createValidUser();
+        var user = createValidUser();
         user.setUsername(username);
         return user;
     }

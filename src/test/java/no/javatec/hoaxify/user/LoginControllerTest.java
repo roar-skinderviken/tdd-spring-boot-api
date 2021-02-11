@@ -115,7 +115,7 @@ public class LoginControllerTest {
      */
     @Test
     public void postLogin_withValidCredentials_receiveLoggedInUserId() {
-        User userInDb = userService.save(createValidUser());
+        var userInDb = userService.save(createValidUser());
         getLoginBodySpec().value(userVM -> assertThat(userVM.getId()).isEqualTo(userInDb.getId()));
     }
 
@@ -124,7 +124,7 @@ public class LoginControllerTest {
      */
     @Test
     public void postLogin_withValidCredentials_receiveLoggedInUsersDisplayName() {
-        User userInDb = userService.save(createValidUser());
+        var userInDb = userService.save(createValidUser());
         getLoginBodySpec().value(userVM -> assertThat(userVM.getDisplayName()).isEqualTo(userInDb.getDisplayName()));
     }
 
@@ -133,7 +133,7 @@ public class LoginControllerTest {
      */
     @Test
     public void postLogin_withValidCredentials_receiveLoggedInUsersUsername() {
-        User userInDb = userService.save(createValidUser());
+        var userInDb = userService.save(createValidUser());
         getLoginBodySpec().value(userVM -> assertThat(userVM.getUsername()).isEqualTo(userInDb.getUsername()));
     }
 

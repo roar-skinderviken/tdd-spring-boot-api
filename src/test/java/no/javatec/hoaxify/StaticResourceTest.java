@@ -31,19 +31,19 @@ public class StaticResourceTest {
 
     @Test
     public void checkStaticFolder_whenAppIsInitialized_uploadFolderMustExists() {
-        File uploadFolder = new File(appConfiguration.getUploadPath());
+        var uploadFolder = new File(appConfiguration.getUploadPath());
         assertThat(uploadFolder.exists() && uploadFolder.isDirectory()).isTrue();
     }
 
     @Test
     public void checkStaticFolder_whenAppIsInitialized_profileImageSubFolderMustExists() {
-        File folder = new File(appConfiguration.getFullProfileImagesPath());
+        var folder = new File(appConfiguration.getFullProfileImagesPath());
         assertThat(folder.exists() && folder.isDirectory()).isTrue();
     }
 
     @Test
     public void checkStaticFolder_whenAppIsInitialized_attachmentsSubFolderMustExists() {
-        File folder = new File(appConfiguration.getFullAttachmentsPath());
+        var folder = new File(appConfiguration.getFullAttachmentsPath());
         assertThat(folder.exists() && folder.isDirectory()).isTrue();
     }
 
