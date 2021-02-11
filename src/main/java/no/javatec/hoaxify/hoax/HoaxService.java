@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
@@ -22,6 +23,7 @@ public class HoaxService {
     private final FileAttachmentRepository fileAttachmentRepository;
     private final FileService fileService;
 
+    @Transactional
     public Hoax save(User user, Hoax hoax) {
         hoax.setTimestamp(new Date());
         hoax.setUser(user);
@@ -68,6 +70,7 @@ public class HoaxService {
         return hoaxRepository.count(spec);
     }
 
+    @Transactional
     public void deleteHoax(long hoaxId) {
         var hoax = hoaxRepository.getOne(hoaxId);
         if (hoax.getAttachment() != null) {

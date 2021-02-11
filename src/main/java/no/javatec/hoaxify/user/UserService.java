@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 
@@ -39,6 +40,7 @@ public class UserService {
         return user;
     }
 
+    @Transactional
     public User update(long id, UserUpdateVM userUpdate) {
         var inDb = userRepository.getOne(id);
         inDb.setDisplayName(userUpdate.getDisplayName());
