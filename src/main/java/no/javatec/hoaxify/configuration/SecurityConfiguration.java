@@ -1,6 +1,6 @@
 package no.javatec.hoaxify.configuration;
 
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -14,10 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
-@RequiredArgsConstructor
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
-
-    private final AuthUserService authUserService;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -36,9 +33,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .authorizeRequests().anyRequest().permitAll();
     }
 
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(authUserService).passwordEncoder(passwordEncoder());
+    @Autowired
+    public void configureGlobal(AuthenticationManagerBuilder builder, AuthUserService authUserService) throws Exception {
+        builder.userDetailsService(authUserService).passwordEncoder(passwordEncoder());
     }
 
     @Bean
