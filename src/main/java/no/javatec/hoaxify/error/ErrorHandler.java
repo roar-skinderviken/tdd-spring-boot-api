@@ -24,7 +24,6 @@ public class ErrorHandler implements ErrorController {
                 (String) attrs.get("path"));
     }
 
-    @Override
     public String getErrorPath() {
         return ERROR_PATH;
     }

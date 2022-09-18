@@ -23,11 +23,6 @@ spring:
       pageable:
         default-page-size: 10
         max-page-size: 100
-hoaxify:
-  labels:
-    simple: value1
-    net.gcuisinier: value2
-    net.[gcuisinier/env]: value3
 ---
 spring:
   config:
